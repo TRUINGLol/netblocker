@@ -22,7 +22,7 @@ Built with **Avalonia UI** and **.NET**, NetBlocker offers a native-like experie
 NetBlocker is distributed as a standalone portable application. No complex installation is required.
 
 ### 1. Download
-Head over to the [GitHub Releases](https://github.com/yourusername/netblocker/releases) page and download the archive for your operating system:
+Head over to the [GitHub Releases](https://github.com/TRUINGLol/netblocker/releases) page and download the archive for your operating system:
 - `NetBlocker-win-x64.zip` (Windows)
 - `NetBlocker-linux-x64.tar.gz` (Linux)
 - `NetBlocker-osx-x64.app.zip` / `NetBlocker-osx-arm64.app.zip` (macOS)
@@ -46,7 +46,7 @@ Extract the archive and run the executable. **Note: NetBlocker requires administ
 
 ## 🛠 For Developers
 
-Want to build NetBlocker from source or understand how it works? Check out our documentation:
+Want to build NetBlocker from source or understand how it works? Check out documentation:
 
 - 🏗️ **[Architecture Docs](docs/architecture.md):** Deep dive into the project structure and cross-platform implementation.
 - ╓ **[Build Guide](docs/build.md):** How to use our automated build scripts for all platforms.
@@ -56,3 +56,5 @@ Want to build NetBlocker from source or understand how it works? Check out our d
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+<sub>— application was written using Gemini 3 agents.</sub>
