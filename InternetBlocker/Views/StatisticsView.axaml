@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InternetBlocker.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="InternetBlocker.Views.StatisticsView"
+             x:DataType="vm:StatisticsViewModel">
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" Margin="10, 5" Padding="10" Background="#222" CornerRadius="4">
+            <TextBlock Text="Network Analytics Dashboard" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        </Border>
+        
+        <ScrollViewer Grid.Row="1">
+            <WrapPanel Margin="10" Orientation="Horizontal">
+                <!-- Total Connections -->
+                <Border Width="200" Height="120" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="15">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Text="Total Processed" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Text="{Binding TotalConnectionsProcessed}" FontSize="28" FontWeight="Bold" Foreground="#00d4ff"/>
+                        <TextBlock Text="Connections" FontSize="10" Opacity="0.4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Active Connections -->
+                <Border Width="200" Height="120" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="15">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Text="Currently Active" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Text="{Binding ActiveConnectionsCount}" FontSize="28" FontWeight="Bold" Foreground="#4caf50"/>
+                        <TextBlock Text="Live Streams" FontSize="10" Opacity="0.4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Blocked Apps -->
+                <Border Width="200" Height="120" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="15">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Text="Protection Active" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Text="{Binding BlockedAppsCount}" FontSize="28" FontWeight="Bold" Foreground="#ff4444"/>
+                        <TextBlock Text="Apps Restricted" FontSize="10" Opacity="0.4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Most Active -->
+                <Border Width="200" Height="120" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="15">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Text="Most Active App" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Text="{Binding MostActiveApp}" FontSize="20" FontWeight="Bold" Foreground="#ff9800" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="System Lead" FontSize="10" Opacity="0.4"/>
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

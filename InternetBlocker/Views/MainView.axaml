@@ -1,0 +1,229 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InternetBlocker.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="using:InternetBlocker.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="InternetBlocker.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.PreviewWith>
+    <vm:MainViewModel />
+  </Design.PreviewWith>
+
+    <UserControl.Resources>
+        <conv:BytesToImageConverter x:Key="BytesToImageConverter"/>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
+        <!-- Admin Warning -->
+        <Border Grid.Row="0" IsVisible="{Binding !IsElevated}" Background="#ff4444" Padding="5">
+            <TextBlock Text="Warning: Application is not running as Administrator. Firewall blocking will not work." 
+                       HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" FontSize="12"/>
+        </Border>
+
+        <!-- Header / Navigation -->
+        <Border Grid.Row="1" Padding="15, 10">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                    <GradientStop Offset="0" Color="#1e1e1e"/>
+                    <GradientStop Offset="1" Color="#2d2d2d"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20">
+                    <TextBlock Text="NetBlocker" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="20" Foreground="#00d4ff"/>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <Button Content="Monitor" Command="{Binding NavigateToMonitor}" Classes="NavButton" />
+                        <Button Content="Blocked" Command="{Binding NavigateToBlocked}" Classes="NavButton" />
+                        <Button Content="Statistics" Command="{Binding NavigateToStatistics}" Classes="NavButton" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="Autostart" VerticalAlignment="Center" FontSize="12" Opacity="0.7"/>
+                        <ToggleSwitch IsChecked="{Binding IsAutostartEnabled}" OnContent="" OffContent=""/>
+                    </StackPanel>
+                    <TextBlock Text="v1.0.0" VerticalAlignment="Center" FontSize="10" Opacity="0.5"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="2" Margin="10" CornerRadius="8" Background="#181818" ClipToBounds="True">
+            <ContentControl Content="{Binding CurrentPage}">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="vm:MonitorViewModel">
+                        <Grid RowDefinitions="*, Auto">
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Connections}" AutoGenerateColumns="False" IsReadOnly="True" 
+                                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="" Width="40">
+                                        <DataTemplate>
+                                            <Image Width="16" Height="16" 
+                                                   Margin="5,0"
+                                                   Stretch="Uniform"
+                                                   Source="{Binding IconData, Converter={StaticResource BytesToImageConverter}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" Width="150"/>
+                                    <DataGridTextColumn Header="Remote Address" Binding="{Binding RemoteAddress}" Width="180"/>
+                                    <DataGridTextColumn Header="Port" Binding="{Binding RemotePort}" Width="80"/>
+                                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                                    <DataGridTextColumn Header="Path" Binding="{Binding ProcessPath}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Action" Width="100">
+                                        <DataTemplate>
+                                            <Button Content="Block" 
+                                                    Command="{Binding $parent[DataGrid].((vm:MonitorViewModel)DataContext).BlockAppCommand}" 
+                                                    CommandParameter="{Binding}"
+                                                    HorizontalAlignment="Center"
+                                                    Classes="ActionRed"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="vm:BlockedViewModel">
+                        <Grid RowDefinitions="Auto, *, Auto">
+                            <Border Grid.Row="0" Margin="10, 5" Padding="10" Background="#222" CornerRadius="4">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Text="Blocked Applications &amp; IPs" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                                    <Button Content="Import" 
+                                            Command="{Binding ImportBlockedListCommand}"
+                                            CommandParameter="{Binding $parent[TopLevel]}"
+                                            Classes="ActionGrey"/>
+                                    <Button Content="Export" 
+                                            Command="{Binding ExportBlockedListCommand}"
+                                            CommandParameter="{Binding $parent[TopLevel]}"
+                                            Classes="ActionGrey"/>
+                                    <Button Content="+ Add Application" 
+                                            Command="{Binding AddApplicationManualCommand}"
+                                            CommandParameter="{Binding $parent[TopLevel]}"
+                                            Classes="ActionBlue"/>
+                                </StackPanel>
+                                </Grid>
+                            </Border>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding BlockedEntities}" Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="15" BorderBrush="#222" BorderThickness="0,0,0,1">
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <StackPanel Grid.Column="0" Spacing="5">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" Foreground="#fff"/>
+                                                    <TextBlock Text="{Binding Value}" FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Content="Unblock" 
+                                                        Command="{Binding $parent[ListBox].((vm:BlockedViewModel)DataContext).UnblockCommand}" 
+                                                        CommandParameter="{Binding}"
+                                                        Classes="ActionGrey"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="vm:StatisticsViewModel">
+                        <UserControl x:Name="StatsControl">
+                             <ContentControl Content="{Binding}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate DataType="vm:StatisticsViewModel">
+                                         <Grid RowDefinitions="Auto, *">
+                                            <Border Grid.Row="0" Margin="10, 5" Padding="10" Background="#222" CornerRadius="4">
+                                                <TextBlock Text="Network Analytics Dashboard" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                            </Border>
+                                            
+                                            <ScrollViewer Grid.Row="1">
+                                                <WrapPanel Margin="10" Orientation="Horizontal">
+                                                    <!-- Total Connections -->
+                                                    <Border Width="190" Height="100" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="12">
+                                                        <StackPanel Spacing="5" VerticalAlignment="Center">
+                                                            <TextBlock Text="Total Processed" FontSize="11" Opacity="0.6"/>
+                                                            <TextBlock Text="{Binding TotalConnectionsProcessed}" FontSize="24" FontWeight="Bold" Foreground="#00d4ff"/>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Active Connections -->
+                                                    <Border Width="190" Height="100" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="12">
+                                                        <StackPanel Spacing="5" VerticalAlignment="Center">
+                                                            <TextBlock Text="Currently Active" FontSize="11" Opacity="0.6"/>
+                                                            <TextBlock Text="{Binding ActiveConnectionsCount}" FontSize="24" FontWeight="Bold" Foreground="#4caf50"/>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Blocked Apps -->
+                                                    <Border Width="190" Height="100" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="12">
+                                                        <StackPanel Spacing="5" VerticalAlignment="Center">
+                                                            <TextBlock Text="Apps Restricted" FontSize="11" Opacity="0.6"/>
+                                                            <TextBlock Text="{Binding BlockedAppsCount}" FontSize="24" FontWeight="Bold" Foreground="#ff4444"/>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Most Active -->
+                                                    <Border Width="190" Height="100" Margin="5" Background="#2d2d2d" CornerRadius="8" Padding="12">
+                                                        <StackPanel Spacing="5" VerticalAlignment="Center">
+                                                            <TextBlock Text="Most Active App" FontSize="11" Opacity="0.6"/>
+                                                            <TextBlock Text="{Binding MostActiveApp}" FontSize="18" FontWeight="Bold" Foreground="#ff9800" TextTrimming="CharacterEllipsis"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </WrapPanel>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                             </ContentControl>
+                        </UserControl>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </Border>
+        <!-- Footer / Status Bar -->
+        <Border Grid.Row="3" Background="#111" Padding="10, 5" BorderBrush="#222" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="20">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Total Connections:" FontSize="10" Opacity="0.6"/>
+                    <TextBlock Text="{Binding Monitor.TotalConnections}" FontSize="10" FontWeight="SemiBold" Foreground="#00d4ff"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Unique Processes:" FontSize="10" Opacity="0.6"/>
+                    <TextBlock Text="{Binding Monitor.UniqueProcessesCount}" FontSize="10" FontWeight="SemiBold" Foreground="#00d4ff"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Blocked Rules:" FontSize="10" Opacity="0.6"/>
+                    <TextBlock Text="{Binding Blocked.BlockedEntities.Count}" FontSize="10" FontWeight="SemiBold" Foreground="#ff4444"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+    <UserControl.Styles>
+        <Style Selector="Button.NavButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10, 5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="Button.ActionBlue">
+            <Setter Property="Background" Value="#00d4ff"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="15, 5"/>
+        </Style>
+        <Style Selector="Button.ActionRed">
+            <Setter Property="Background" Value="#88ff0000"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="10, 2"/>
+        </Style>
+        <Style Selector="Button.ActionGrey">
+            <Setter Property="Background" Value="#333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="10, 2"/>
+        </Style>
+    </UserControl.Styles>
+</UserControl>
